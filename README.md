@@ -21,6 +21,34 @@ e.g.
     ./git_monitor.sh /home/me/git/devstack DevStack git_devstack@myaddr.com
 
 
+Setting up cron:
+----------------
+
+I'm currently running the script once per hour under cron to monitor the
+DevStack repository.
+
+To do that I first cloned the repo with the commands:
+
+    mkdir -p /home/mike/src/git/devstack
+    cd /home/mike/src/git/devstack
+    git clone git://github.com/openstack-dev/devstack.git
+
+Then I created a crontab entry in /home/mike/usr/cron/crontab as:
+
+    ######################################################################
+    ## GIT scraping:
+
+    GIT_MONITOR=/home/mike/z/bin/Deployed/git_monitor.sh
+
+    #Every hour:
+    55 * * * *  $GIT_MONITOR /home/mike/src/git/devstack DevStack email@mike.com
+
+Then enabled cron:
+    crontab /home/mike/usr/cron/crontab
+
+Then I sit back and wait for others to work on DevStack ...
+
+
 Sendmail.pl
 -----------
 
