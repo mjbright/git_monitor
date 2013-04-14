@@ -26,7 +26,8 @@ LAST_COMMITER_INFO=` git log --pretty=format:'%ad %ae' -n 1`
 
 # Pull latest code:
 git pull 2>&1 | grep -q "Already up-to-date." \
-    && exit 0
+    && { echo "Already up-to-date"; exit 0; } || \
+    echo "Changes seen."
 
 # Create log-diff of all changes since hash $LASTHASH:
 # Send o/p by e-mail:
