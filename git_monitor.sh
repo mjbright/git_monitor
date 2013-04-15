@@ -29,10 +29,42 @@ git pull 2>&1 | grep -q "Already up-to-date." \
     && { echo "Already up-to-date"; exit 0; } || \
     echo "Changes seen."
 
-# Create log-diff of all changes since hash $LASTHASH:
-# Send o/p by e-mail:
-SUBJECT="[git] $REPO_NAME diff-log since hash $LASTHASH [$LAST_COMMITER_INFO]"
-git log ${LASTHASH}..HEAD -p | \
-  $MAILER -s "$SUBJECT" -t $EMAIL
+sendGroupedUpdates() {
+    # Create log-diff of all changes since hash $LASTHASH:
+    # Send o/p by e-mail:
+    SUBJECT="[git:grouped] $REPO_NAME diff-log since hash $LASTHASH [$LAST_COMMITER_INFO]"
+    git log ${LASTHASH}..HEAD -p | \
+      $MAILER -s "$SUBJECT" -t $EMAIL
+}
+
+sendIndividualUpdates() {
+    export LASTHASH
+
+    HASHLIST=`git log | perl -ne '
+      if (/^commit (\w+)/) {
+        if ($1 eq "$ENV{LASTHASH}") {
+            print join(" ", reverse @HASHES);
+            exit(0);
+        };
+        push(@HASHES, $1);
+        #print $1." ";
+      }'`
+
+    PREVHASH=$LASTHASH
+    for HASH in $HASHLIST;do
+        #LAST_COMMITER_INFO=` git log --pretty=format:'%ad %ae' -n 1`
+        LAST_COMMITER_INFO=`git log ${PREVHASH}..${HASH} --pretty=format:'%ad %ae' -n 1`
+
+        SUBJECT="[git] $REPO_NAME diff-log with hash $HASH [$LAST_COMMITER_INFO]"
+        git log ${PREVHASH}..${HASH} -p | \
+          $MAILER -s "$SUBJECT" -t $EMAIL
+
+        PREVHASH=$HASH
+    done
+}
+
+sendGroupedUpdates
+
+sendIndividualUpdates
 
 
