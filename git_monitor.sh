@@ -32,7 +32,7 @@ git pull 2>&1 | grep -q "Already up-to-date." \
 sendGroupedUpdates() {
     # Create log-diff of all changes since hash $LASTHASH:
     # Send o/p by e-mail:
-    SUBJECT="[git:grouped] $REPO_NAME diff-log since hash $LASTHASH [$LAST_COMMITER_INFO]"
+    SUBJECT="[gitmail:grouped] $REPO_NAME diff-log since hash $LASTHASH [$LAST_COMMITER_INFO]"
     git log ${LASTHASH}..HEAD -p | \
       $MAILER -s "$SUBJECT" -t $EMAIL
 }
@@ -55,7 +55,7 @@ sendIndividualUpdates() {
         #LAST_COMMITER_INFO=` git log --pretty=format:'%ad %ae' -n 1`
         LAST_COMMITER_INFO=`git log ${PREVHASH}..${HASH} --pretty=format:'%ad %ae' -n 1`
 
-        SUBJECT="[git] $REPO_NAME diff-log with hash $HASH [$LAST_COMMITER_INFO]"
+        SUBJECT="[gitmail] $REPO_NAME diff-log with hash $HASH [$LAST_COMMITER_INFO]"
         git log ${PREVHASH}..${HASH} -p | \
           $MAILER -s "$SUBJECT" -t $EMAIL
 
